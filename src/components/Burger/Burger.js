@@ -9,6 +9,7 @@ const Burger = (props) => {
             return <BurgerIngredient key={igKey + i} type={igKey} />
         })
     })
+    //logic for transforming objects to arrays
     .reduce((arr, el) => {
         return arr.concat(el)
     }, []);
