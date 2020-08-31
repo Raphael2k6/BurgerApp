@@ -5,6 +5,9 @@ import axios from '../../../axios-orders'
 import Spinner from '../../../components/UI/Spinner/Spinner'
 import Input from '../../../components/UI/Input/Input'
 import { connect } from 'react-redux'
+import withErrorHandler from '../../../Hoc/withErrorHandler/withErrorHandler'
+import * as actions from '../../../store/actions/index';
+
 
 class ContactData extends Component {
     state = {
@@ -118,13 +121,12 @@ class ContactData extends Component {
                 valid: true
             },
         },
-        formIsValid: false,
-        loading: false
+        formIsValid: false
     }
 
     orderHandler = (event) => {
         event.preventDefault();
-        this.setState({ loading: true})
+        //this.setState({ loading: true})
         const formData = {};
         for (let formElementIdentifier in this.state.orderForm) {
             formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
@@ -132,18 +134,11 @@ class ContactData extends Component {
         const order = {
             ingredients: this.props.ings,
             price: this.props.price,
-            orderData: formData
-        }
-        axios.post('/orders.json', order)
-            .then(response => {
-                console.log(response)
-                this.setState({ loading: false})
-                this.props.history.push('/')
-            })
-            .catch(error => {
-                this.setState({ loading: false })
-            })
-        }
+            orderData: formData,
+            userId: this.props.userId
+        } 
+        this.props.onOrderBurger(order, this.props.token)  
+    }
 //since the state have object with values that are also objects, a simple spread operator cannot do a deep clone of the objects, hence a double clone
     
 checkValidity (value, rules) {
@@ -215,7 +210,7 @@ inputChangedHandler = (event, inputIdentifier) => {
             //the button element can still work for the form submission
             //<Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
 
-        if (this.state.loading) {
+        if (this.props.loading) {
             form = <Spinner />  
         }
         return (
@@ -229,9 +224,17 @@ inputChangedHandler = (event, inputIdentifier) => {
 
 const mapStateToProps = state => {
     return {
-        ings: state.ingredients,
-        price: state.totalPrice
+        ings: state.burgerBuilder.ingredients,
+        price: state.burgerBuilder.totalPrice,
+        loading: state.order.loading,
+        token: state.auth.token,
+        userId: state.auth.userId
     }
 }
 
-export default connect(mapStateToProps)(ContactData);
+const mapDispatchToProps = dispatch => {
+    return {
+        onOrderBurger: (orderData, token) => dispatch(actions.purchaseBurger(orderData, token))
+    }
+}        
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios));
