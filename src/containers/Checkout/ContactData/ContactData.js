@@ -52,7 +52,7 @@ class ContactData extends Component {
                 },
                 valid: false,
                 touched: false
-                
+
             },
             country: {
                 elementType: 'input',
@@ -99,8 +99,8 @@ class ContactData extends Component {
                 elementType: 'select',
                 elementConfig: {
                     options: [
-                        {value: 'fastest', displayValue: 'Fastest'},
-                        {value: 'cheapest', displayValue: 'Cheapest'}
+                        { value: 'fastest', displayValue: 'Fastest' },
+                        { value: 'cheapest', displayValue: 'Cheapest' }
                     ]
                 },
                 validation: {},
@@ -111,9 +111,9 @@ class ContactData extends Component {
                 elementType: 'select',
                 elementConfig: {
                     options: [
-                        {value: 'cash', displayValue: 'Cash'},
-                        {value: 'KongaPay', displayValue: 'Konga Pay'},
-                        {value: 'card', displayValue: 'Card'}
+                        { value: 'cash', displayValue: 'Cash' },
+                        { value: 'KongaPay', displayValue: 'Konga Pay' },
+                        { value: 'card', displayValue: 'Card' }
                     ]
                 },
                 validation: {},
@@ -136,35 +136,35 @@ class ContactData extends Component {
             price: this.props.price,
             orderData: formData,
             userId: this.props.userId
-        } 
-        this.props.onOrderBurger(order, this.props.token)  
+        }
+        this.props.onOrderBurger(order, this.props.token)
     }
-//since the state have object with values that are also objects, a simple spread operator cannot do a deep clone of the objects, hence a double clone
-    
-checkValidity (value, rules) {
-    let isValid = true;
-// to solve tha validation error due to the dropdown manu without a validation object, there are two ways
-// adding an empty validation object to the dropdown
-// validation = {} or
-// if (!rules) {
-//     return true
-// } 
-    if (rules.required) {
-        isValid = value.trim() !== '' && isValid;
-    }
-//isValid is initially false but if the right hand side is true, isValid becomes true.
-    if (rules.minLength) {
-        isValid = value.length >= rules.minLength && isValid
+    //since the state have object with values that are also objects, a simple spread operator cannot do a deep clone of the objects, hence a double clone
+
+    checkValidity(value, rules) {
+        let isValid = true;
+        // to solve tha validation error due to the dropdown manu without a validation object, there are two ways
+        // adding an empty validation object to the dropdown
+        // validation = {} or
+        // if (!rules) {
+        //     return true
+        // } 
+        if (rules.required) {
+            isValid = value.trim() !== '' && isValid;
+        }
+        //isValid is initially false but if the right hand side is true, isValid becomes true.
+        if (rules.minLength) {
+            isValid = value.length >= rules.minLength && isValid
+        }
+
+        if (rules.maxLength) {
+            isValid = value.length <= rules.maxLength && isValid
+        }
+        return isValid
     }
 
-    if (rules.maxLength) {
-        isValid = value.length <= rules.maxLength && isValid
-    }
-    return isValid
-}
 
-
-inputChangedHandler = (event, inputIdentifier) => {
+    inputChangedHandler = (event, inputIdentifier) => {
         const updatedOrderForm = {
             ...this.state.orderForm
         };
@@ -175,16 +175,16 @@ inputChangedHandler = (event, inputIdentifier) => {
         updatedFormElement.valid = this.checkValidity(updatedFormElement.value, updatedFormElement.validation);
         updatedFormElement.touched = true;
         updatedOrderForm[inputIdentifier] = updatedFormElement;
-       
+
         let formIsValid = true;
         for (let inputIdentifier in updatedOrderForm) {
             formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid
         }
-        
-        this.setState({orderForm: updatedOrderForm, formIsValid: formIsValid})
-    }    
 
-    render () {
+        this.setState({ orderForm: updatedOrderForm, formIsValid: formIsValid })
+    }
+
+    render() {
         const formElementsArray = [];
         for (let key in this.state.orderForm) {
             formElementsArray.push({
@@ -193,30 +193,30 @@ inputChangedHandler = (event, inputIdentifier) => {
             })
         }
         let form = (
-            <form onSubmit={this.orderHandler}> 
+            <form onSubmit={this.orderHandler}>
                 {formElementsArray.map(formElement => (
                     <Input
-                        key={formElement.id} 
+                        key={formElement.id}
                         elementType={formElement.config.elementType}
                         elementConfig={formElement.config.elementConfig}
                         value={formElement.config.value}
-                        invalid={!formElement.config.valid} 
+                        invalid={!formElement.config.valid}
                         shouldValidate={formElement.config.validation}
                         touched={formElement.config.touched}
-                        changed={(event) => this.inputChangedHandler(event, formElement.id)}/> 
+                        changed={(event) => this.inputChangedHandler(event, formElement.id)} />
                 ))}
                 <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
             </form>)
-            //the button element can still work for the form submission
-            //<Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
+        //the button element can still work for the form submission
+        //<Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
 
         if (this.props.loading) {
-            form = <Spinner />  
+            form = <Spinner />
         }
         return (
             <div className={classes.ContactData}>
-               <h4>Enter your contact data</h4> 
-               {form}
+                <h4>Enter your contact data</h4>
+                {form}
             </div>
         )
     }
@@ -236,5 +236,5 @@ const mapDispatchToProps = dispatch => {
     return {
         onOrderBurger: (orderData, token) => dispatch(actions.purchaseBurger(orderData, token))
     }
-}        
+}
 export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios));
